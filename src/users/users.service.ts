@@ -2,12 +2,23 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './entity/user.repository';
+import { User } from './entity/user.entity';
+import { TeamRepository } from '../teams/entity/team.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly userRepository: UserRepository) {}
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly teamRepository: TeamRepository,
+  ) {}
+  async create(createUser: User) {
+    const findTeam = await this.teamRepository.findOne({
+      where: { name: '바르셀로나FC' },
+      relations: ['users'],
+    });
+
+    createUser.team = findTeam;
+    await this.userRepository.save(createUser);
   }
 
   findAll() {

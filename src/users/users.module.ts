@@ -5,11 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
 import { TypeOrmExModule } from '../typeorm-ex.module';
 import { UserRepository } from './entity/user.repository';
+import { Team } from '../teams/entity/team.entity';
+import { TeamRepository } from '../teams/entity/team.repository';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
-    TypeOrmExModule.forCustomRepository([UserRepository]),
+    TypeOrmModule.forFeature([User, Team]),
+    TypeOrmExModule.forCustomRepository([UserRepository, TeamRepository]),
   ],
   exports: [TypeOrmModule, TypeOrmExModule],
   controllers: [UsersController],
