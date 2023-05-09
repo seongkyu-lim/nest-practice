@@ -15,6 +15,6 @@ export function getTypeOrmModule() {
     entities: [User, Team],
     autoLoadEntities: true,
     synchronize: true,
-    logging: false,
+    logging: true,
   });
 }
