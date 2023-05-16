@@ -1,33 +1,39 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './entity/user.repository';
 import { User } from './entity/user.entity';
 import { TeamRepository } from '../teams/entity/team.repository';
-import { find } from 'rxjs';
-import { DataSource } from 'typeorm';
-import {query} from "express";
+import { DataSource, EntityManager } from 'typeorm';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
+  private readonly userRepository = new UserRepository(
+    User,
+    new EntityManager(this.dataSource),
+  );
   constructor(
     @Inject(DataSource) private readonly dataSource: DataSource,
-    private readonly userRepository: UserRepository,
+    // private readonly userRepository: UserRepository,
     private readonly teamRepository: TeamRepository,
   ) {}
 
   async onModuleInit() {
-    await this.queryRunnerTest;
+    // await this.queryRunnerTest;
     // await this.findOne(1);
+    const user = new User();
+    user.name = '하이';
+    user.age = 1;
+    await this.create(user);
   }
   async create(createUser: User) {
-    const findTeam = await this.teamRepository.findOne({
-      where: { name: '바르셀로나FC' },
-      relations: ['users'],
-    });
+    // const findTeam = await this.teamRepository.findOne({
+    //   where: { name: '바르셀로나FC' },
+    //   relations: ['users'],
+    // });
 
-    createUser.team = findTeam;
-    await this.userRepository.save(createUser);
+    // createUser.team = findTeam;
+    const savedUser = await this.userRepository.save(createUser);
+    console.log(savedUser.id);
   }
 
   findAll() {
@@ -35,7 +41,7 @@ export class UsersService implements OnModuleInit {
   }
 
   async findOne(id: number) {
-    await this.userRepository.findOneBy({name: '임성규'});
+    await this.userRepository.findOneBy({ name: '임성규' });
     return `This action returns a #${id} user`;
   }
 
