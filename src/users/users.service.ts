@@ -4,6 +4,9 @@ import { UserRepository } from './entity/user.repository';
 import { User } from './entity/user.entity';
 import { TeamRepository } from '../teams/entity/team.repository';
 import { DataSource, EntityManager } from 'typeorm';
+import { BlobServiceClient } from '@azure/storage-blob';
+import { HttpService } from '@nestjs/axios';
+import {firstValueFrom} from "rxjs";
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -11,19 +14,27 @@ export class UsersService implements OnModuleInit {
     User,
     new EntityManager(this.dataSource),
   );
+  private readonly blobServiceClient: BlobServiceClient;
+
   constructor(
     @Inject(DataSource) private readonly dataSource: DataSource,
     // private readonly userRepository: UserRepository,
     private readonly teamRepository: TeamRepository,
-  ) {}
+    private readonly httpService: HttpService,
+  ) {
+    this.blobServiceClient = BlobServiceClient.fromConnectionString(
+      'DefaultEndpointsProtocol=https;AccountName=nile;AccountKey=QYImbM8rcBjejzIlxvk2iON1d/agnUwOifSe3qNN0rJgo6KcF49ea660tSVL592cu0Z9rTX7diEL+ASttNhwxg==;EndpointSuffix=core.windows.net',
+    );
+  }
 
   async onModuleInit() {
     // await this.queryRunnerTest;
     // await this.findOne(1);
-    const user = new User();
-    user.name = '하이';
-    user.age = 1;
-    await this.create(user);
+    // const user = new User();
+    // user.name = '하이';
+    // user.age = 1;
+    // await this.create(user);
+    await this.uploadImageToAzureStorageTest();
   }
   async create(createUser: User) {
     // const findTeam = await this.teamRepository.findOne({
@@ -87,5 +98,23 @@ export class UsersService implements OnModuleInit {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  private async uploadImageToAzureStorageTest() {
+    const containerClient =
+      this.blobServiceClient.getContainerClient('social-images');
+    const blockBlobClient = containerClient.getBlockBlobClient('seasoningTest');
+
+    const imageResponse = await firstValueFrom(
+      this.httpService.get(
+        'https://pbs.twimg.com/news_img/1656972076027359235/j9W2DPKB?format=png&name=orig',
+        { responseType: 'arraybuffer' },
+      ),
+    );
+
+    const imageBuffer = Buffer.from(imageResponse.data, 'binary');
+    const response = await blockBlobClient.uploadData(imageBuffer);
+    console.log(response);
+    console.log(blockBlobClient.url);
   }
 }

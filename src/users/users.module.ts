@@ -7,13 +7,15 @@ import { TypeOrmExModule } from '../typeorm-ex.module';
 import { UserRepository } from './entity/user.repository';
 import { Team } from '../teams/entity/team.entity';
 import { TeamRepository } from '../teams/entity/team.repository';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
+    HttpModule,
     TypeOrmModule.forFeature([User, Team]),
     TypeOrmExModule.forCustomRepository([UserRepository, TeamRepository]),
   ],
-  exports: [TypeOrmModule, TypeOrmExModule],
+  exports: [TypeOrmModule, TypeOrmExModule, HttpModule],
   controllers: [UsersController],
   providers: [UsersService],
 })
