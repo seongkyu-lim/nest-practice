@@ -3,10 +3,13 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { TeamsModule } from './teams/teams.module';
-import { getTypeOrmModule } from './getTypeOrmModule';
+// import { getTypeOrmModule } from './getTypeOrmModule';
+import { JenumController } from './jenum/jenum.controller';
+import { JenumService } from './jenum/jenum.service';
+import { JenumModule } from './jenum/jenum.module';
 
 @Module({
-  imports: [getTypeOrmModule(), UsersModule, TeamsModule],
+  imports: [JenumModule],
   controllers: [AppController],
   providers: [AppService],
 })
