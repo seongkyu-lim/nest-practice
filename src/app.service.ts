@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {VoteType} from "./jenum/jenum.enum";
+import { VoteType } from './jenum/jenum.enum';
 
 @Injectable()
 export class AppService {
